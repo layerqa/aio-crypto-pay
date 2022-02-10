@@ -27,8 +27,9 @@ class CryptoPay:
         Returns:
             Exception: [Exception models]
         """
-        if response['error']['code'] == 401:
-            raise Unauthorized(response['error']['code'], response['error']['name'])
+        if response['ok'] == False:
+            if response['error']['code'] == 401:
+                raise Unauthorized(response['error']['code'], response['error']['name'])
     
     async def close_client(self) -> None:
         """Close client session"""
@@ -43,7 +44,5 @@ class CryptoPay:
         """
         async with self._client.get(url='/api/getMe') as response:
             response_json = await response.json()
-            if response_json['ok'] == True:
-                return App(**response_json['result'])
-            elif response_json['ok'] == False:
-                self._raise_errors(response=response_json)
+            self._raise_errors(response=response_json)
+            return App(**response_json['result'])
