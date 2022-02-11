@@ -1,7 +1,9 @@
+from typing import List, Optional, Union
+
 from aiohttp.client import ClientSession
 
-from .types import Hostnames, App
 from .exceptions import Unauthorized
+from .types import Hostnames, App, Balance, Currencies, ExchangeRates, Assets, InvoiceStatus
 
 
 class CryptoPay:
@@ -46,3 +48,35 @@ class CryptoPay:
             response_json = await response.json()
             self._raise_errors(response=response_json)
             return App(**response_json['result'])
+    
+    async def get_balance(self) -> List[Balance]:
+        """Use this method to get a balance of your app. Returns array of assets.
+
+        Returns:
+            List[Balance]: [Balance list model]
+        """
+        async with self._client.get(url='/api/getBalance') as response:
+            response_json = await response.json()
+            self._raise_errors(response=response_json)
+            return [Balance(**balance) for balance in response_json['result']]
+    
+    async def get_currencies(self) -> List[Currencies]:
+        """Use this method to get a list of supported currencies. Returns array of currencies.
+
+        Returns:
+            List[Currencies]: [Currencies list model]
+        """
+        async with self._client.get(url='/api/getCurrencies') as response:
+            response_json = await response.json()
+            self._raise_errors(response=response_json)
+            return [Currencies(**currencies) for currencies in response_json['result']]
+    
+    async def get_exchange_rates(self) -> List[ExchangeRates]:
+        """Use this method to get exchange rates of supported currencies. Returns array of currencies.
+
+        Returns:
+            List[ExchangeRates]: [ExchangeRates list model]
+        """
+        async with self._client.get(url='/api/getExchangeRates') as response:
+            response_json = await response.json()
+            return [ExchangeRates(**exchange_rates) for exchange_rates in response_json['result']]
